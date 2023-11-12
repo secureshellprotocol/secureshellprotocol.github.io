@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The web site of personal-hub</title>
+    <!-- The style.css file allows you to change the look of your web pages.
+         If you include the next line in all your web pages, they will all share the same look.
+         This makes it easier to make new pages for your site. -->
+    <link href="/style.css" rel="stylesheet" type="text/css" media="all">
+  </head>
+  <body>
+    <h1>Chroot Environment Tutorial</h1>
+    <hr>
+    <p>
+      Over the quarantine, I decided to spend some of my free time testing out penetration testing tools on my home server. Penetration testing (pentesting for short) is just testing a machine for possible exploits and security flaws. <br><br>
+      I intended to just test and make sure there wasn't a large surface for outside attackers to exploit on my home machine, so I found Kali Linux just fine for my needs, since it offers a load of tools for testing various exploits on my machine. This page just intends on exploring options with low overhead requirements for getting Kali Linux running on an existing Linux system. You will need root access when doing this. <br><br>
+      I needed to get Kali up and running on my laptop, but I didn't want to sacrifice any computational power to running a VM, and I wanted to be versatile enough so I wouldn't have to reboot into a seperate Kali Linux environment. I could just overwrite my existing Debian Linux installation, but Kali was insecure for desktop use since it relied on single user operation (running as the admin account/root all the time), and I did'nt intend on doing nothing but pentesting. It seemed obvious after a little pondering: I could just import the kali repos and install the tools from there... how bad could it be? <br><br>
+      <a href='https://wiki.debian.org/DontBreakDebian#Don.27t_make_a_FrankenDebian'>Very bad.</a><br><br>
+      So after breaking my installation, I kept looking on the internet for possible solutions, and I discovered <a href='https://tldp.org/HOWTO/Multi-Distro-Dev/index.html'>this site</a> which basically goes over how to make development environments for testing multiple Linux environments. It's sort of hacky, but it does offer both advantages I was looking for.<br><br>
+      I mostly followed the instructions, but I made a few changes. I found it a little silly to make a dedicated partition for the Kali environment. It would've been simple enough just to dedicate it a folder, since it's just being used for the pentesting software and some logs, so there's not a huge need to restrict its disk space. <br><br>
+      The only real issue with this solution is the kernel difference. The kernel is basically what makes Linux, Linux. It dictates the interaction between the software on my laptop (web browsers, file manager, terminal), and has it talk to the hardware. It managaes ram consumption, cpu usage, and anything to do with hardware. When using a chroot environment, you're using the host system's kernel (as well as mounting /proc and /tmp from the host, too), so that means I would be using my Debian kernel. Kali has a slightly modified kernel, adding wifi drivers and a few more changes from what I'm aware. From my experience, this doesn't break anything, but could be a possible issue in the future, since kali offers <a href='https://www.kali.org/docs/nethunter/nethunter-kernel-2-config-1/'>plenty of options</a> for specialization. But since this is for more general-purpose pentesting, we wont worry.<br><br>
+      Okay, alphabet soup over. Back to the main point. I used a tool which comes with debian called <a href='https://wiki.debian.org/Debootstrap'>Debootstrap</a>, which basically streamlines the chroot-creation process for Debian-based systems. All Debian-based means is that an organization uses Debian Linux and changes it to fit its needs. For example: Kali Linux took Debian Linux and geared it towards penetration testing, rather than Debian's goal of stability. <a href='https://www.debian.org/derivatives/'>Further reading here, if you want.</a><br><br>
+      I set up a folder in /opt/ called "chroots", and then made a folder inside of that called "kali", and used this command to basically get it all going for me:
+      <pre>
+# debootstrap --arch=amd64 kali-rolling /opt/chroots/kali http://http.kali.org/kali
+      </pre>
+      Note: this must be run as root!<br><br>
+      Afterwards, following the previously mentioned guide, I created a bash script which streamlines the mounting and entrance of a kali chroot (must be run as root/using sudo every time).<br><br>
+      <pre>
+#!/bin/bash
+#kali chroot order of operations
+#check for root/sudo, exit 0 if gone
+if [ "$EUID" -ne  0 ]
+        then echo "Run me as root"
+        exit
+fi
+#adds local user root to the xauthority list, so X server on host can be utilized
+#done in order to make sure Xorg works properly w/ chroot
+#BE AWARE: if it complains make sure $DISPLAY is correctly set in the chroot env!
+xhost +si:localuser:root
+
+#mount tmp and proc @ /opt/chroots/kali
+echo "Mounting proc in chroot..."
+mount --bind /proc /opt/chroots/kali/proc
+echo "Mounting tmp in chroot..."
+mount --bind /tmp /opt/chroots/kali/tmp
+
+#enter chroot
+chroot /opt/chroots/kali
+
+#exit cleanly and unmount tmp and proc
+echo "Unmounting proc and tmp..."
+umount /opt/chroots/kali/proc
+umount /opt/chroots/kali/tmp
+      </pre>
+      Few key things to note! I made sure that it could access the Xorg Server, so graphical applications work, i.e. wireshark. You just have to make sure that, when you're in the chroot environment after the script succeeds, you set the display variable $DISPLAY to your Xorg screen. If you're not sure, run "echo $DISPLAY" in a host machine shell, (NOT in the chroot shell), and then in the chroot shell run "export DISPLAY=(whatever came out before)". In my case, DISPLAY ends up being :0
+      Thats it! After making the script executable and saving it in my home folder, I had a fully working Kali Linux chroot environment!
+    </p>
+  </body>
+</html>

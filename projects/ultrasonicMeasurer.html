@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The web site of personal-hub</title>
+    <!-- The style.css file allows you to change the look of your web pages.
+         If you include the next line in all your web pages, they will all share the same look.
+         This makes it easier to make new pages for your site. -->
+    <link href="/style.css" rel="stylesheet" type="text/css" media="all">
+  </head>
+  <body>
+    <h1>Ultrasonic Measurer (08/01/20)</h1>
+
+    <p>Just as a nice side project to pass time during quarantine, I looked up and found how to make an ultrasonic measurer device.</p>
+    <p>Source here: <a href="https://www.instructables.com/id/Pocket-Sonic-Scale/">Instructables "Pocket Sonic Ruler"</a>
+    <p>I made use of what was listed in the project, and the classic arduino code can be found here, as well as my modified  <a href='https://github.com/hotfudge-repo/ultrasonicMeasurerDevice'>code</a></p>
+    <p>The creator said "you can add your own modifications" on the site but attached no license, and there was no mention of this being someone else, so please don't sue me!</p>
+    <p>The original author neglected to share the library for the TM1637 Display, you can get it <a href='https://github.com/avishorp/TM1637'>here</a>
+    <p>I changed mine to measure in inches (to challenge myself, it measures in centimeters by default fyi) and only "re-measure" every 3 seconds, instead of .5s</p>
+    <p>Laser 'circuit' set up, going to implement soon</p>
+    <p>Project Pictures!</p>
+    <a href="https://ibb.co/nbXpQhx"><img src="https://i.ibb.co/hyG02p3/IMG-0095.jpg" alt="IMG-0095" border="0"></a><br /><a target='_blank' href='https://imgbb.com/'></a><br />
+    <a href="https://ibb.co/ZzTCj8D"><img src="https://i.ibb.co/yFsJ9yj/IMG-0096.jpg" alt="IMG-0096" border="0"></a><br /><a target='_blank' href='https://imgbb.com/'></a><br />
+    <p>Parts list just incase the link goes down:</p>
+    <ul>
+      <li>Arduino UNO (Pretty sure most arduinos will work though, depending on someones form factor)</li>
+      <li>TM1637 Display</li>
+      <li>HC-SR04 ultrasonic device</li>
+      <li>Misc. items, such as a switch, 9V battery, and jumper wires</li>
+    </ul>
+  </body>
+</html>
